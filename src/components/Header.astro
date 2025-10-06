@@ -1,0 +1,51 @@
+---
+const currentPath = Astro.url.pathname;
+---
+
+<header class="bg-black/30 backdrop-blur-lg border-b border-white/20 sticky top-0 z-50">
+  <nav class="container mx-auto px-6 py-4">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center space-x-2">
+        <span class="text-2xl">🐧</span>
+        <a href="/" class="text-xl font-bold text-white hover:text-cyan-300 transition-colors no-underline">
+          Pingouins Analytics
+        </a>
+      </div>
+      
+      <div class="flex space-x-1">
+        <a 
+          href="/"
+          class={`px-4 py-2 rounded-lg font-medium transition-all duration-200 no-underline ${
+            currentPath === '/' 
+              ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg' 
+              : 'text-blue-200 hover:bg-white/10 hover:text-white'
+          }`}
+        >
+          Accueil
+        </a>
+        
+        <a 
+          href="/rendu-dynamique"
+          class={`px-4 py-2 rounded-lg font-medium transition-all duration-200 no-underline ${
+            currentPath.startsWith('/rendu-dynamique') 
+              ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg' 
+              : 'text-blue-200 hover:bg-white/10 hover:text-white'
+          }`}
+        >
+          Rendu Dynamique
+        </a>
+        
+        <a 
+          href="/rendu-statique"
+          class={`px-4 py-2 rounded-lg font-medium transition-all duration-200 no-underline ${
+            currentPath.startsWith('/rendu-statique') 
+              ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg' 
+              : 'text-blue-200 hover:bg-white/10 hover:text-white'
+          }`}
+        >
+          Rendu Statique
+        </a>
+      </div>
+    </div>
+  </nav>
+</header>

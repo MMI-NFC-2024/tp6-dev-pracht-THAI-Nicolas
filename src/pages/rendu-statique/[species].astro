@@ -1,0 +1,169 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import PlotFigure from "../../components/PlotFigure.astro";
+import * as Plot from "@observablehq/plot";
+import penguins from "../../assets/penguins.json";
+
+
+export function getStaticPaths() {
+  const species = [...new Set(penguins.map(penguin => penguin.species))];
+  
+  return species.map((specie) => {
+    const speciesData = penguins.filter((penguin) => penguin.species === specie);
+    const islands = [...new Set(speciesData.map(p => p.island))];
+    const sexes = [...new Set(speciesData.map(p => p.sex))];
+    
+    return {
+      params: { species: specie.toLowerCase() },
+      props: { 
+        formattedSpecies: specie,
+        speciesData,
+        islands,
+        sexes
+      }
+    };
+  });
+}
+
+
+const { formattedSpecies, speciesData, islands, sexes } = Astro.props;
+---
+
+<Layout>
+  <div class="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 relative overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-r from-blue-600/10 via-cyan-500/5 to-purple-600/10"></div>
+    <div class="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-cyan-400/30 to-blue-600/30 rounded-full blur-3xl"></div>
+    <div class="absolute bottom-0 left-0 w-80 h-80 bg-gradient-to-tr from-indigo-500/20 to-purple-600/20 rounded-full blur-3xl"></div>
+    
+    <div class="relative z-10 container mx-auto px-6 py-12">
+      <div class="text-center mb-12">
+        <h1 class="text-5xl font-bold mb-4 bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
+          Analyse des Pingouins (Statique)
+        </h1>
+        <h2 class="text-4xl font-bold text-white mb-2 drop-shadow-lg">
+          Espèce: <span class="bg-gradient-to-r from-cyan-300 to-blue-300 bg-clip-text text-transparent drop-shadow-none">{formattedSpecies}</span>
+        </h2>
+        <p class="text-xl text-blue-100 font-medium drop-shadow-md">
+          {speciesData.length} individus analysés
+        </p>
+        
+        <div class="mt-4 flex justify-center space-x-4 text-sm text-blue-200">
+          <span>Îles: {islands.join(', ')}</span>
+          <span>•</span>
+          <span>Sexes: {sexes.join(', ')}</span>
+        </div>
+      </div>
+      
+      <div class="backdrop-blur-xl bg-white/15 rounded-3xl border border-white/30 shadow-2xl p-8">
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
+          
+          <div class="bg-black/20 backdrop-blur-md rounded-2xl border border-white/25 p-6 hover:bg-black/30 transition-all duration-300 shadow-lg">
+            <div class="flex items-center mb-4">
+              <div class="w-3 h-8 bg-gradient-to-b from-cyan-400 to-blue-500 rounded-full mr-3 shadow-lg shadow-cyan-500/30"></div>
+              <h3 class="text-xl font-bold text-white drop-shadow-lg">Longueur vs Profondeur du bec</h3>
+            </div>
+            <PlotFigure
+              options={{
+                marks: [
+                  Plot.dot(speciesData, {
+                    x: "culmen_length_mm",
+                    y: "culmen_depth_mm",
+                    fill: "sex",
+                    stroke: "island",
+                    r: 4
+                  }),
+                ],
+                color: {
+                  legend: true
+                },
+                grid: true,
+                x: { label: "Longueur du bec (mm)" },
+                y: { label: "Profondeur du bec (mm)" },
+                title: `${formattedSpecies} - Morphologie du bec`,
+                style: {
+                  color: "white",
+                  backgroundColor: "transparent"
+                }
+              }}
+            />
+          </div>
+
+          <div class="bg-black/20 backdrop-blur-md rounded-2xl border border-white/25 p-6 hover:bg-black/30 transition-all duration-300 shadow-lg">
+            <div class="flex items-center mb-4">
+              <div class="w-3 h-8 bg-gradient-to-b from-purple-400 to-indigo-500 rounded-full mr-3 shadow-lg shadow-purple-500/30"></div>
+              <h3 class="text-xl font-bold text-white drop-shadow-lg">Masse vs Longueur des nageoires</h3>
+            </div>
+            <PlotFigure
+              options={{
+                marks: [
+                  Plot.dot(speciesData, {
+                    x: "flipper_length_mm",
+                    y: "body_mass_g",
+                    fill: "sex",
+                    stroke: "island",
+                    r: 4
+                  }),
+                ],
+                color: {
+                  legend: true
+                },
+                grid: true,
+                x: { label: "Longueur des nageoires (mm)" },
+                y: { label: "Masse corporelle (g)" },
+                title: `${formattedSpecies} - Taille et masse`,
+                style: {
+                  color: "white",
+                  backgroundColor: "transparent"
+                }
+              }}
+            />
+          </div>
+        </div>
+
+        <div class="mt-8 bg-black/20 backdrop-blur-md rounded-2xl border border-white/25 p-6 hover:bg-black/30 transition-all duration-300 shadow-lg">
+          <div class="flex items-center mb-4">
+            <div class="w-3 h-8 bg-gradient-to-b from-emerald-400 to-teal-500 rounded-full mr-3 shadow-lg shadow-emerald-500/30"></div>
+            <h3 class="text-xl font-bold text-white drop-shadow-lg">Distribution de la masse corporelle</h3>
+          </div>
+          <PlotFigure
+            options={{
+              marks: [
+                Plot.rectY(speciesData, Plot.binX({y: "count"}, {
+                  x: "body_mass_g",
+                  fill: "sex",
+                  stroke: "white"
+                })),
+              ],
+              color: {
+                legend: true
+              },
+              x: { label: "Masse corporelle (g)" },
+              y: { label: "Nombre d'individus" },
+              title: `${formattedSpecies} - Répartition des masses`,
+              style: {
+                color: "white",
+                backgroundColor: "transparent"
+              }
+            }}
+          />
+        </div>
+
+        <div class="mt-8 flex justify-center gap-4">
+          <a 
+            href="/rendu-statique"
+            class="inline-block px-6 py-3 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors duration-200 no-underline"
+          >
+            Retour aux espèces
+          </a>
+          
+          <a 
+            href="/"
+            class="inline-block px-6 py-3 bg-cyan-600 text-white font-medium rounded-lg hover:bg-cyan-700 transition-colors duration-200 no-underline"
+          >
+            Vue d'ensemble
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>

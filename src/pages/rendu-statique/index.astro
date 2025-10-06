@@ -1,0 +1,64 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import penguins from "../../assets/penguins.json";
+
+const species = [...new Set(penguins.map(penguin => penguin.species))].sort();
+---
+
+<Layout>
+  <div class="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 relative overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-r from-blue-600/10 via-cyan-500/5 to-purple-600/10"></div>
+    <div class="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-cyan-400/30 to-blue-600/30 rounded-full blur-3xl"></div>
+    <div class="absolute bottom-0 left-0 w-80 h-80 bg-gradient-to-tr from-indigo-500/20 to-purple-600/20 rounded-full blur-3xl"></div>
+    
+    <div class="relative z-10 container mx-auto px-6 py-12">
+      <div class="text-center mb-12">
+        <h1 class="text-5xl font-bold mb-4 bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
+          Espèces de Pingouins (Rendu Statique)
+        </h1>
+        <p class="text-xl text-blue-200/80 font-light">
+          Sélectionnez une espèce pour voir son analyse détaillée
+        </p>
+      </div>
+      
+      <div class="backdrop-blur-xl bg-white/15 rounded-3xl border border-white/30 shadow-2xl p-8">
+        <div class="max-w-2xl mx-auto space-y-4">
+          {species.map((specie) => {
+            const speciesData = penguins.filter(penguin => penguin.species === specie);
+            return (
+              <a 
+                href={`/rendu-statique/${specie.toLowerCase()}`}
+                class="block bg-white/10 backdrop-blur-md rounded-xl border border-white/20 p-6 hover:bg-white/15 hover:border-white/30 transition-all duration-300 no-underline"
+              >
+                <div class="flex items-center justify-between">
+                  <div>
+                    <h2 class="text-2xl font-bold text-white mb-1">
+                      {specie}
+                    </h2>
+                    <p class="text-blue-200">
+                      {speciesData.length} individus
+                    </p>
+                  </div>
+                  <div class="text-cyan-400">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                  </div>
+                </div>
+              </a>
+            );
+          })}
+        </div>
+        
+        <div class="mt-8 text-center">
+          <a 
+            href="/"
+            class="inline-block px-6 py-3 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors duration-200 no-underline"
+          >
+            Retour à la vue d'ensemble
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>
