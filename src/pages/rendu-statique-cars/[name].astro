@@ -1,0 +1,219 @@
+---
+import PlotFigure from "../../components/PlotFigure.astro";
+import Layout from "../../layouts/Layout.astro";
+import * as Plot from "@observablehq/plot";
+import cars from "../../assets/cars.json";
+
+export function getStaticPaths() {
+  const carBrands = [...new Set(cars.map(car => car.name.split(' ')[0]))].sort();
+  
+  return carBrands.map((brand) => {
+    const brandCars = cars.filter(car => car.name.startsWith(brand));
+    const years = [...new Set(brandCars.map(car => car.year))].sort();
+    const cylinders = [...new Set(brandCars.map(car => car.cylinders))].sort();
+    
+    return {
+      params: { name: brand.toLowerCase() },
+      props: { 
+        formattedBrand: brand,
+        brandCars,
+        years,
+        cylinders
+      }
+    };
+  });
+}
+
+const { formattedBrand, brandCars, years, cylinders } = Astro.props;
+---
+
+<Layout>
+  <div class="min-h-screen bg-gradient-to-br from-slate-900 via-orange-900 to-red-900 relative overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-r from-orange-600/10 via-red-500/5 to-pink-600/10"></div>
+    <div class="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-orange-400/30 to-red-600/30 rounded-full blur-3xl"></div>
+    <div class="absolute bottom-0 left-0 w-80 h-80 bg-gradient-to-tr from-red-500/20 to-pink-600/20 rounded-full blur-3xl"></div>
+    
+    <div class="relative z-10 container mx-auto px-6 py-12">
+      <div class="mb-8">
+        <a 
+          href="/rendu-statique-cars" 
+          class="inline-flex items-center px-6 py-3 bg-black/20 backdrop-blur-md rounded-xl border border-white/25 text-orange-200 hover:text-white hover:bg-black/30 transition-all duration-300"
+        >
+          ← Retour à la liste
+        </a>
+      </div>
+
+      <div class="text-center mb-12">
+        <h1 class="text-5xl font-bold mb-4 text-white drop-shadow-lg">
+          Marque: <span class="bg-gradient-to-r from-orange-300 to-red-300 bg-clip-text text-transparent drop-shadow-none">{formattedBrand}</span>
+        </h1>
+        <p class="text-xl text-orange-100 font-medium drop-shadow-md">
+          {brandCars.length} modèle{brandCars.length > 1 ? 's' : ''} analysé{brandCars.length > 1 ? 's' : ''}
+        </p>
+        <p class="text-sm text-orange-200/60 mt-2">
+          Années: {Math.min(...years)} - {Math.max(...years)} | Cylindres: {cylinders.join(', ')}
+        </p>
+      </div>
+      
+      <div class="backdrop-blur-xl bg-white/15 rounded-3xl border border-white/30 shadow-2xl p-8">
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
+          <!-- Graphique: Cylindres vs Puissance -->
+          <div class="bg-black/20 backdrop-blur-md rounded-2xl border border-white/25 p-6 hover:bg-black/30 transition-all duration-300 shadow-lg">
+            <div class="flex items-center mb-4">
+              <div class="w-3 h-8 bg-gradient-to-b from-orange-400 to-red-500 rounded-full mr-3 shadow-lg shadow-orange-500/30"></div>
+              <h3 class="text-xl font-bold text-white drop-shadow-lg">Cylindres vs Puissance</h3>
+            </div>
+            <PlotFigure
+              options={{
+                marks: [
+                  Plot.dot(brandCars, {
+                    x: "cylinders",
+                    y: "power (hp)",
+                    fill: "year",
+                    r: 6
+                  }),
+                ],
+                grid: true,
+                x: { label: "Nombre de cylindres" },
+                y: { label: "Puissance (hp)" },
+                style: {
+                  color: "white",
+                  backgroundColor: "transparent"
+                }
+              }}
+            />
+          </div>
+
+          <!-- Graphique: Poids vs Consommation -->
+          <div class="bg-black/20 backdrop-blur-md rounded-2xl border border-white/25 p-6 hover:bg-black/30 transition-all duration-300 shadow-lg">
+            <div class="flex items-center mb-4">
+              <div class="w-3 h-8 bg-gradient-to-b from-yellow-400 to-orange-500 rounded-full mr-3 shadow-lg shadow-yellow-500/30"></div>
+              <h3 class="text-xl font-bold text-white drop-shadow-lg">Poids vs Consommation</h3>
+            </div>
+            <PlotFigure
+              options={{
+                marks: [
+                  Plot.dot(brandCars, {
+                    x: "weight (lb)",
+                    y: "economy (mpg)",
+                    fill: "cylinders",
+                    r: 6
+                  }),
+                ],
+                grid: true,
+                x: { label: "Poids (lb)" },
+                y: { label: "Économie (mpg)" },
+                style: {
+                  color: "white",
+                  backgroundColor: "transparent"
+                }
+              }}
+            />
+          </div>
+
+          <!-- Graphique: Displacement vs Puissance -->
+          <div class="bg-black/20 backdrop-blur-md rounded-2xl border border-white/25 p-6 hover:bg-black/30 transition-all duration-300 shadow-lg">
+            <div class="flex items-center mb-4">
+              <div class="w-3 h-8 bg-gradient-to-b from-pink-400 to-red-500 rounded-full mr-3 shadow-lg shadow-pink-500/30"></div>
+              <h3 class="text-xl font-bold text-white drop-shadow-lg">Cylindrée vs Puissance</h3>
+            </div>
+            <PlotFigure
+              options={{
+                marks: [
+                  Plot.dot(brandCars, {
+                    x: "displacement (cc)",
+                    y: "power (hp)",
+                    fill: "cylinders",
+                    r: 6
+                  }),
+                ],
+                grid: true,
+                x: { label: "Cylindrée (cc)" },
+                y: { label: "Puissance (hp)" },
+                style: {
+                  color: "white",
+                  backgroundColor: "transparent"
+                }
+              }}
+            />
+          </div>
+
+          <!-- Graphique: Accélération vs Année -->
+          <div class="bg-black/20 backdrop-blur-md rounded-2xl border border-white/25 p-6 hover:bg-black/30 transition-all duration-300 shadow-lg">
+            <div class="flex items-center mb-4">
+              <div class="w-3 h-8 bg-gradient-to-b from-purple-400 to-pink-500 rounded-full mr-3 shadow-lg shadow-purple-500/30"></div>
+              <h3 class="text-xl font-bold text-white drop-shadow-lg">Accélération vs Année</h3>
+            </div>
+            <PlotFigure
+              options={{
+                marks: [
+                  Plot.dot(brandCars, {
+                    x: "year",
+                    y: "0-60 mph (s)",
+                    fill: "cylinders",
+                    r: 6
+                  }),
+                ],
+                grid: true,
+                x: { label: "Année" },
+                y: { label: "0-60 mph (s)" },
+                style: {
+                  color: "white",
+                  backgroundColor: "transparent"
+                }
+              }}
+            />
+          </div>
+        </div>
+
+        <!-- Graphique: Distribution de la puissance -->
+        <div class="mt-8 bg-black/20 backdrop-blur-md rounded-2xl border border-white/25 p-6 hover:bg-black/30 transition-all duration-300 shadow-lg">
+          <div class="flex items-center mb-4">
+            <div class="w-3 h-8 bg-gradient-to-b from-red-400 to-pink-500 rounded-full mr-3 shadow-lg shadow-red-500/30"></div>
+            <h3 class="text-xl font-bold text-white drop-shadow-lg">Distribution de la puissance</h3>
+          </div>
+          <PlotFigure
+            options={{
+              marks: [
+                Plot.rectY(brandCars, Plot.binX({y: "count"}, {
+                  x: "power (hp)",
+                  stroke: "white"
+                })),
+              ],
+              x: { label: "Puissance (hp)" },
+              y: { label: "Nombre de modèles" },
+              style: {
+                color: "white",
+                backgroundColor: "transparent"
+              }
+            }}
+          />
+        </div>
+
+        <!-- Distribution de la consommation -->
+        <div class="mt-8 bg-black/20 backdrop-blur-md rounded-2xl border border-white/25 p-6 hover:bg-black/30 transition-all duration-300 shadow-lg">
+          <div class="flex items-center mb-4">
+            <div class="w-3 h-8 bg-gradient-to-b from-green-400 to-emerald-500 rounded-full mr-3 shadow-lg shadow-green-500/30"></div>
+            <h3 class="text-xl font-bold text-white drop-shadow-lg">Distribution de la consommation</h3>
+          </div>
+          <PlotFigure
+            options={{
+              marks: [
+                Plot.rectY(brandCars, Plot.binX({y: "count"}, {
+                  x: "economy (mpg)",
+                  stroke: "white"
+                })),
+              ],
+              x: { label: "Économie (mpg)" },
+              y: { label: "Nombre de modèles" },
+              style: {
+                color: "white",
+                backgroundColor: "transparent"
+              }
+            }}
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>

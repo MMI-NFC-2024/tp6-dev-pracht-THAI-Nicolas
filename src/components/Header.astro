@@ -6,44 +6,67 @@ const currentPath = Astro.url.pathname;
   <nav class="container mx-auto px-6 py-4">
     <div class="flex items-center justify-between">
       <div class="flex items-center space-x-2">
-        <span class="text-2xl">🐧</span>
         <a href="/" class="text-xl font-bold text-white hover:text-cyan-300 transition-colors no-underline">
-          Pingouins Analytics
+          TP-6 PRACHT R312
         </a>
       </div>
       
-      <div class="flex space-x-1">
+      <div class="flex flex-wrap gap-1">
         <a 
           href="/"
-          class={`px-4 py-2 rounded-lg font-medium transition-all duration-200 no-underline ${
+          class={`px-3 py-2 rounded-lg font-medium transition-all duration-200 no-underline text-sm ${
             currentPath === '/' 
               ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg' 
               : 'text-blue-200 hover:bg-white/10 hover:text-white'
           }`}
         >
-          Accueil
+          🏠 Accueil
         </a>
         
         <a 
           href="/rendu-dynamique"
-          class={`px-4 py-2 rounded-lg font-medium transition-all duration-200 no-underline ${
-            currentPath.startsWith('/rendu-dynamique') 
+          class={`px-3 py-2 rounded-lg font-medium transition-all duration-200 no-underline text-sm ${
+            currentPath.startsWith('/rendu-dynamique') && !currentPath.includes('cars')
               ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg' 
               : 'text-blue-200 hover:bg-white/10 hover:text-white'
           }`}
         >
-          Rendu Dynamique
+          🐧 Dynamique
         </a>
         
         <a 
           href="/rendu-statique"
-          class={`px-4 py-2 rounded-lg font-medium transition-all duration-200 no-underline ${
-            currentPath.startsWith('/rendu-statique') 
+          class={`px-3 py-2 rounded-lg font-medium transition-all duration-200 no-underline text-sm ${
+            currentPath.startsWith('/rendu-statique') && !currentPath.includes('cars')
               ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg' 
               : 'text-blue-200 hover:bg-white/10 hover:text-white'
           }`}
         >
-          Rendu Statique
+          🐧 Statique
+        </a>
+
+        <div class="w-px h-8 bg-white/20 mx-1"></div>
+        
+        <a 
+          href="/rendu-dynamique-cars"
+          class={`px-3 py-2 rounded-lg font-medium transition-all duration-200 no-underline text-sm ${
+            currentPath.startsWith('/rendu-dynamique-cars')
+              ? 'bg-gradient-to-r from-orange-500 to-red-600 text-white shadow-lg' 
+              : 'text-orange-200 hover:bg-white/10 hover:text-white'
+          }`}
+        >
+          🚗 Dynamique
+        </a>
+        
+        <a 
+          href="/rendu-statique-cars"
+          class={`px-3 py-2 rounded-lg font-medium transition-all duration-200 no-underline text-sm ${
+            currentPath.startsWith('/rendu-statique-cars')
+              ? 'bg-gradient-to-r from-orange-500 to-red-600 text-white shadow-lg' 
+              : 'text-orange-200 hover:bg-white/10 hover:text-white'
+          }`}
+        >
+          🚗 Statique
         </a>
       </div>
     </div>
